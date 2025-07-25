@@ -91,7 +91,7 @@ export default function HeroSection() {
         transition={{ delay: 0.53, duration: 0.55, type: "spring" }}
       >
         <span className="px-5 py-2 bg-blue-700/30 backdrop-blur-md rounded-lg text-base md:text-lg font-medium text-blue-50 border border-blue-300/10 shadow-lg">
-          Chennai, Tamil Nadu &middot; BTech CSE &middot; CGPA 9.31
+          Chennai, Tamil Nadu &middot; BTech CSE &middot; CGPA 9.35
         </span>
       </motion.div>
 
