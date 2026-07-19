@@ -1,160 +1,149 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useState, useEffect } from "react";
 
 const PROFILE_IMAGE = "/Shahishnu JR_Photo.jpg";
 
+const TypewriterText = ({ text }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        setDisplayedText(text.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 50);
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return (
+    <div className="h-12 flex items-center justify-center mb-8">
+      <motion.p 
+        className="text-gray-400 text-center max-w-xl px-4 text-sm md:text-base"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        {displayedText}
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ repeat: Infinity, duration: 0.8 }}
+          className="inline-block w-1.5 h-4 ml-1 bg-cyan-400 align-middle"
+        />
+      </motion.p>
+    </div>
+  );
+};
+
 export default function HeroSection() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-100, 100], [10, -10]);
+  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set(e.clientX - centerX);
+    y.set(e.clientY - centerY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <section
       id="about"
-      className="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-[#19224A] via-purple-900 to-black text-white overflow-hidden"
-      style={{ paddingTop: "7rem", paddingBottom: "3rem" }}
+      className="relative min-h-screen flex flex-col justify-center items-center bg-[#0a0a0a] overflow-hidden"
     >
+      {/* Background Orbs */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        initial={{ scale: 0.95, opacity: 0.3 }}
-        animate={{ scale: 1.12, opacity: 1 }}
-        transition={{ duration: 1.2, type: "spring" }}
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
       >
-        <div className="w-[460px] h-[460px] bg-gradient-to-tr from-blue-700/70 via-purple-700/60 to-fuchsia-600/40 rounded-full blur-3xl opacity-60" />
+        <div className="w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[120px] opacity-50 absolute top-1/2 left-1/4 -translate-y-1/2" />
+        <div className="w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-[100px] opacity-40 absolute top-1/2 right-1/4 -translate-y-1/2" />
       </motion.div>
-      <div className="absolute inset-0 pointer-events-none z-10">
-        <div className="absolute left-0 right-0 top-[35%] h-px bg-gradient-to-r from-transparent via-blue-300/15 to-transparent" />
-        <div className="absolute top-0 bottom-0 left-[32%] w-px bg-gradient-to-b from-transparent via-purple-300/12 to-transparent" />
-      </div>
 
       <motion.div
-        className="relative z-20 flex flex-col items-center"
-        initial={{ y: 36, opacity: 0 }}
+        className="relative z-20 flex flex-col items-center mt-12 w-full max-w-4xl px-4"
+        initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.85, type: "spring" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="relative">
+        {/* Interactive 3D Profile Image */}
+        <motion.div 
+          className="relative mb-8 group perspective-[1000px]"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ rotateX, rotateY, z: 100 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
           <motion.img
             src={PROFILE_IMAGE}
-            alt="Photo of Shahishnu J R"
-            className="w-44 h-44 md:w-56 md:h-56 rounded-full shadow-2xl border-4 border-blue-400/80 bg-white/20 object-cover ring-4 ring-fuchsia-200/30"
-            style={{
-              boxShadow: "0 6px 40px 0 rgba(80,60,165,0.22), 0 1.5px 10px 0 rgba(140,90,255,0.13)",
-            }}
-            initial={{ scale: 0.76 }}
+            alt="Shahishnu J R"
+            className="relative w-40 h-40 md:w-48 md:h-48 rounded-full object-cover ring-2 ring-white/10 shadow-2xl"
+            initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.9, type: "spring", delay: 0.03 }}
+            transition={{ duration: 0.8, type: "spring", delay: 0.1 }}
           />
-          <motion.div
-            className="absolute inset-0 rounded-full bg-blue-500/20 blur-2xl pointer-events-none"
-            animate={{
-              opacity: [0.24, 0.38, 0.24],
-              scale: [1, 1.07, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 4.6,
-              type: "tween",
-              repeatType: "mirror",
-            }}
-          />
-        </div>
-      </motion.div>
+        </motion.div>
 
-      <motion.h1
-        className="relative z-20 text-[2.3rem] md:text-5xl font-bold text-center mt-6 mb-2 drop-shadow-lg"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.16, duration: 0.87, type: "spring" }}
-      >
-        Hi, I'm{" "}
-        <span className="bg-gradient-to-r from-blue-300 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+        <motion.h1
+          className="text-5xl md:text-7xl font-bold text-center mb-4 tracking-tight text-white"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+        >
           Shahishnu J R
-        </span>
-      </motion.h1>
-      <motion.p
-        className="relative z-20 text-xl md:text-2xl text-blue-100 text-center mb-7 font-medium"
-        initial={{ y: 16, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.27, duration: 0.6, type: "spring" }}
-      >
-        AI Enthusiast · Software Developer · Big Problem Solver
-      </motion.p>
-      <motion.div
-        className="relative z-20 mb-7 max-w-xl font-normal text-blue-100 text-center text-lg md:text-xl"
-        initial={{ opacity: 0, y: 28 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.43, duration: 0.57, type: "spring" }}
-      >
-        Passionate about building intelligent, impactful software. Let's create something meaningful together.
-      </motion.div>
-      <motion.div
-        className="relative z-20 mb-8"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.53, duration: 0.55, type: "spring" }}
-      >
-        <span className="px-5 py-2 bg-blue-700/30 backdrop-blur-md rounded-lg text-base md:text-lg font-medium text-blue-50 border border-blue-300/10 shadow-lg">
-          Chennai, Tamil Nadu &middot; BTech CSE &middot; CGPA 9.35
-        </span>
-      </motion.div>
+        </motion.h1>
 
-      <motion.div
-        className="relative z-20 flex flex-wrap justify-center gap-5 mb-2"
-        initial={{ opacity: 0, y: 25 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.68, duration: 0.52, type: "spring" }}
-      >
-        <a
-          href="#projects"
-          className="inline-block w-44 px-6 py-3 rounded-lg bg-gradient-to-tr from-blue-600 via-purple-700 to-fuchsia-600 text-white font-semibold shadow-xl ring-1 ring-purple-300/50 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-fuchsia-400/20"
+        <motion.p
+          className="text-lg md:text-xl text-cyan-300 text-center max-w-2xl px-4 font-medium leading-relaxed mb-6"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
         >
-          View Projects
-        </a>
-        <a
-          href="#contact"
-          className="inline-block w-44 px-6 py-3 rounded-lg bg-gradient-to-tr from-purple-700 via-blue-600 to-fuchsia-700 text-white font-semibold shadow-xl ring-1 ring-blue-300/40 transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-blue-400/20"
-        >
-          Contact Me
-        </a>
-      </motion.div>
+          AI Enthusiast · Software Developer
+        </motion.p>
 
-      <motion.div
-        className="relative z-20 flex gap-4 mt-10"
-        initial={{ opacity: 0, y: 13 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.5, type: "spring" }}
-      >
-        <a
-          href="mailto:Sair62995@gmail.com"
-          className="p-3 rounded-full bg-white/10 hover:bg-blue-400/30 transition duration-150 shadow ring-1 ring-blue-400/10"
-          aria-label="Email"
+        <TypewriterText text="Building intelligent systems and exploring the intersection of AI, IoT, and modern web technologies to solve real-world problems." />
+
+        {/* Social Links */}
+        <motion.div
+          className="flex gap-6 mb-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
         >
-          {/* email svg */}
-          <svg width="26" height="26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 6a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm2 0v.01L13 13l9-6.99V6H4zm0 2.236V20h18V8.236l-8.553 6.668a2 2 0 0 1-2.894 0L4 8.236z" />
-          </svg>
-        </a>
-        <a
-          href="https://github.com/shahishnujr"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-3 rounded-full bg-white/10 hover:bg-purple-300/30 transition duration-150 shadow ring-1 ring-purple-300/10"
-          aria-label="GitHub"
-        >
-          {/* github svg */}
-          <svg width="26" height="26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13 2C6.373 2 1 7.373 1 14c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.26.82-.577V21.87c-3.338.726-4.033-1.415-4.033-1.415-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.238 1.84 1.238 1.07 1.834 2.807 1.304 3.492.997.108-.775.419-1.305.762-1.605-2.665-.303-5.466-1.332-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.51 11.51 0 0 1 13 7.844c1.02.005 2.047.138 3.008.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.119 3.176.77.84 1.236 1.911 1.236 3.221 0 4.609-2.803 5.625-5.475 5.921.43.371.823 1.103.823 2.222v3.293c0 .32.218.694.825.576C19.565 23.796 23 19.299 23 14c0-6.627-5.373-12-12-12z" />
-          </svg>
-        </a>
-        <a
-          href="https://www.linkedin.com/in/shahishnu-j-r-66b395269/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-3 rounded-full bg-white/10 hover:bg-fuchsia-300/30 transition duration-150 shadow ring-1 ring-fuchsia-300/10"
-          aria-label="LinkedIn"
-        >
-          {/* linkedin svg */}
-          <svg width="26" height="26" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 2h-12a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM8.4 19H6.216v-7.092H8.4V19zM7.309 10.44c-.696 0-1.26-.564-1.26-1.256a1.256 1.256 0 0 1 2.511 0c0 .693-.564 1.256-1.251 1.256zm10.291 8.56h-2.183v-3.418c0-.817-.014-1.87-1.139-1.87-1.142 0-1.316.893-1.316 1.816V19H10.5v-7.092h2.096v.97h.03a2.299 2.299 0 0 1 2.067-1.139c2.207 0 2.614 1.453 2.614 3.343V19z"/>
-          </svg>
-        </a>
+          {[
+            { href: "mailto:Sair62995@gmail.com", icon: <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M2 6a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zm2 0v.01L14 13l10-6.99V6H4zm0 2.236V22h20V8.236l-9.553 6.668a2 2 0 0 1-2.894 0L4 8.236z"/></svg> },
+            { href: "https://github.com/shahishnujr", icon: <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg> },
+            { href: "https://www.linkedin.com/in/shahishnu-j-r-66b395269/", icon: <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg> }
+          ].map((social, idx) => (
+            <motion.a
+              key={idx}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ y: -4, scale: 1.1 }}
+              className="p-3.5 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all shadow-lg backdrop-blur-md"
+            >
+              {social.icon}
+            </motion.a>
+          ))}
+        </motion.div>
       </motion.div>
     </section>
   );

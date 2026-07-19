@@ -1,9 +1,7 @@
-
 export default function Footer() {
     return (
-      <footer className="bg-gray-900 text-gray-400 py-6 text-center">
+      <footer className="bg-[#0a0a0a] text-gray-500 py-8 text-center text-sm border-t border-white/5">
         &copy; {new Date().getFullYear()} Shahishnu J R. All rights reserved.
       </footer>
     );
-  }
-  
+}
